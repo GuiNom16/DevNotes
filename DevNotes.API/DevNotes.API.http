@@ -1,0 +1,6 @@
+@DevNotes.API_HostAddress = http://localhost:5114
+
+GET {{DevNotes.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
