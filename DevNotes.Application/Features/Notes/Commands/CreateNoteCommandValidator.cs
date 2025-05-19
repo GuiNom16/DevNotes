@@ -1,7 +1,7 @@
 ﻿using DevNotes.Application.Features.Notes.Commands;
 using FluentValidation;
 
-namespace DevNotes.Application.Features.Notes.Commands.CreateNote
+namespace DevNotes.Application.Features.Notes.Commands
 {
     public class CreateNoteCommandValidator : AbstractValidator<CreateNoteCommand>
     {

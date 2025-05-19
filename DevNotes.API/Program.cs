@@ -1,11 +1,12 @@
+using DevNotes.Application.Common.Behaviors;
+using DevNotes.Application.Features.Notes.Commands;
 using DevNotes.Infrastructure.Extensions;
 using DevNotes.Infrastructure.Persistence;
-using DevNotes.Application.Features.Notes.Commands;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Reflection;
-using DevNotes.Application.Features.Notes.Commands.CreateNote;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,6 +20,10 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddMediatR(Assembly.Load("DevNotes.Application"));
 builder.Services.AddValidatorsFromAssemblyContaining<CreateNoteCommandValidator>();
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+builder.Services.AddDbContext<NotesDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 
 
 
