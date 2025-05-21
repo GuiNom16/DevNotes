@@ -1,32 +1,32 @@
 ﻿using DevNotes.Application.Features.Notes.Commands;
-using DevNotes.Infrastructure.Persistence;
+using DevNotes.Application.Interfaces;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DevNotes.Application.Notes.Commands
+namespace DevNotes.Application.Features.Notes.Commands
 {
     public class UpdateNoteCommandHandler : IRequestHandler<UpdateNoteCommand, bool>
     {
-        private readonly NotesDbContext _context;
+        private readonly INoteRepository _noteRepository;
 
-        public UpdateNoteCommandHandler(NotesDbContext context)
+        public UpdateNoteCommandHandler(INoteRepository noteRepository)
         {
-            _context = context;
+            _noteRepository = noteRepository;
         }
 
         public async Task<bool> Handle(UpdateNoteCommand request, CancellationToken cancellationToken)
         {
-            var note = await _context.Notes.FirstOrDefaultAsync(n => n.Id == request.Id, cancellationToken);
+            var note = await _noteRepository.GetByIdAsync(request.Id);
             if (note == null) return false;
 
             note.Title = request.Title;
             note.Content = request.Content;
             note.UpdatedAt = DateTime.UtcNow;
 
-            await _context.SaveChangesAsync(cancellationToken);
+            await _noteRepository.UpdateAsync(note);
+
             return true;
         }
     }

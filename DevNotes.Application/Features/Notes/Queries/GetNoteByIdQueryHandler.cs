@@ -1,22 +1,21 @@
-﻿using DevNotes.Domain.Entities;
-using DevNotes.Infrastructure.Persistence;
+﻿using DevNotes.Application.Interfaces;
+using DevNotes.Domain.Entities;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace DevNotes.Application.Features.Notes.Queries
 {
     public class GetNoteByIdQueryHandler : IRequestHandler<GetNoteByIdQuery, Note>
     {
-        private readonly NotesDbContext _context;
+        private readonly INoteRepository _noteRepository;
 
-        public GetNoteByIdQueryHandler(NotesDbContext context)
+        public GetNoteByIdQueryHandler(INoteRepository noteRepository)
         {
-            _context = context;
+            _noteRepository = noteRepository;
         }
 
         public async Task<Note> Handle(GetNoteByIdQuery request, CancellationToken cancellationToken)
         {
-            return await _context.Notes.FirstOrDefaultAsync(n => n.Id == request.Id, cancellationToken);
+            return await _noteRepository.GetByIdAsync(request.Id);
         }
     }
 }

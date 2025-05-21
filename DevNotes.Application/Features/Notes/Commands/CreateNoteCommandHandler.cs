@@ -1,21 +1,19 @@
-﻿using DevNotes.Domain.Entities;
-using DevNotes.Infrastructure.Persistence;
+﻿using DevNotes.Application.Interfaces;
+using DevNotes.Domain.Entities;
 using MediatR;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DevNotes.Application.Features.Notes.Commands
 {
     public class CreateNoteCommandHandler : IRequestHandler<CreateNoteCommand, Guid>
     {
-        private readonly NotesDbContext _context;
+        private readonly INoteRepository _noteRepository;
 
-        public CreateNoteCommandHandler(NotesDbContext context)
+        public CreateNoteCommandHandler(INoteRepository noteRepository)
         {
-            _context = context;
+            _noteRepository = noteRepository;
         }
 
         public async Task<Guid> Handle(CreateNoteCommand request, CancellationToken cancellationToken)
@@ -28,8 +26,7 @@ namespace DevNotes.Application.Features.Notes.Commands
                 CreatedAt = DateTime.UtcNow
             };
 
-            _context.Notes.Add(note);
-            await _context.SaveChangesAsync(cancellationToken);
+            await _noteRepository.AddAsync(note, cancellationToken);
 
             return note.Id;
         }

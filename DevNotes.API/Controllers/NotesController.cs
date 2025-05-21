@@ -2,10 +2,12 @@
 using DevNotes.Application.Features.Notes.Queries;
 using DevNotes.Domain.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DevNotes.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class NotesController : ControllerBase

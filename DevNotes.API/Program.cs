@@ -1,15 +1,20 @@
 using DevNotes.Application.Common.Behaviors;
 using DevNotes.Application.Features.Notes.Commands;
+using DevNotes.Infrastructure.Configuration;
 using DevNotes.Infrastructure.Extensions;
 using DevNotes.Infrastructure.Persistence;
 using FluentValidation;
 using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Reflection;
+using System.Text;
 
 
 var builder = WebApplication.CreateBuilder(args);
+var authSettings = builder.Configuration.GetSection("AuthSettings").Get<AuthSettings>();
 
 // Add services to the container.
 
@@ -23,6 +28,25 @@ builder.Services.AddValidatorsFromAssemblyContaining<CreateNoteCommandValidator>
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 builder.Services.AddDbContext<NotesDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddSingleton(authSettings);
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = authSettings.Issuer,
+        ValidAudience = authSettings.Audience,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authSettings.Key))
+    };
+});
 
 
 
@@ -39,6 +63,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseAuthentication();
 
 app.MapControllers();
 

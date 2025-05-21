@@ -1,27 +1,26 @@
 ﻿using DevNotes.Application.Features.Notes.Commands;
-using DevNotes.Infrastructure.Persistence;
+using DevNotes.Application.Interfaces;
 using MediatR;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DevNotes.Application.Notes.Commands
+namespace DevNotes.Application.Features.Notes.Commands
 {
     public class DeleteNoteCommandHandler : IRequestHandler<DeleteNoteCommand, bool>
     {
-        private readonly NotesDbContext _context;
+        private readonly INoteRepository _noteRepository;
 
-        public DeleteNoteCommandHandler(NotesDbContext context)
+        public DeleteNoteCommandHandler(INoteRepository noteRepository)
         {
-            _context = context;
+            _noteRepository = noteRepository;
         }
 
         public async Task<bool> Handle(DeleteNoteCommand request, CancellationToken cancellationToken)
         {
-            var note = await _context.Notes.FindAsync(request.Id);
+            var note = await _noteRepository.GetByIdAsync(request.Id);
             if (note == null) return false;
 
-            _context.Notes.Remove(note);
-            await _context.SaveChangesAsync(cancellationToken);
+            await _noteRepository.DeleteAsync(request.Id);
 
             return true;
         }
