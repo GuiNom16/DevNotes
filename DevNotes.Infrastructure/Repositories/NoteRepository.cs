@@ -1,6 +1,7 @@
 ﻿using DevNotes.Application.Interfaces;
 using DevNotes.Domain.Entities;
 using DevNotes.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,6 +30,11 @@ namespace DevNotes.Infrastructure.Repositories
             return await _context.Notes.FindAsync(id);
         }
 
+        public async Task<List<Note>> GetAllAsync(CancellationToken cancellationToken)
+        {
+            return await _context.Notes.ToListAsync(cancellationToken);
+        }
+
         public async Task UpdateAsync(Note note)
         {
             _context.Notes.Update(note);
@@ -45,6 +51,7 @@ namespace DevNotes.Infrastructure.Repositories
             }
         }
 
+       
     }
 
 }

@@ -1,10 +1,12 @@
-﻿using DevNotes.Application.Interfaces;
+﻿using DevNotes.Application.DTOs;
+using DevNotes.Application.Interfaces;
+using DevNotes.Application.Mappers;
 using DevNotes.Domain.Entities;
 using MediatR;
 
 namespace DevNotes.Application.Features.Notes.Queries
 {
-    public class GetNoteByIdQueryHandler : IRequestHandler<GetNoteByIdQuery, Note>
+    public class GetNoteByIdQueryHandler : IRequestHandler<GetNoteByIdQuery, NoteDto>
     {
         private readonly INoteRepository _noteRepository;
 
@@ -13,9 +15,10 @@ namespace DevNotes.Application.Features.Notes.Queries
             _noteRepository = noteRepository;
         }
 
-        public async Task<Note> Handle(GetNoteByIdQuery request, CancellationToken cancellationToken)
+        public async Task<NoteDto> Handle(GetNoteByIdQuery request, CancellationToken cancellationToken)
         {
-            return await _noteRepository.GetByIdAsync(request.Id);
+            var note = await _noteRepository.GetByIdAsync(request.Id);
+            return NoteMapper.ToDto(note);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using DevNotes.Domain.Entities;
+﻿using DevNotes.Application.DTOs;
+using DevNotes.Domain.Entities;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -8,5 +9,5 @@ using System.Threading.Tasks;
 
 namespace DevNotes.Application.Features.Notes.Queries
 {
-    public record GetAllNotesQuery() : IRequest<List<Note>>;
+    public record GetAllNotesQuery() : IRequest<List<NoteDto>>;
 }

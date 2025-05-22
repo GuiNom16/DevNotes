@@ -1,5 +1,7 @@
-﻿using DevNotes.Application.Features.Notes.Queries;
+﻿using DevNotes.Application.DTOs;
+using DevNotes.Application.Features.Notes.Queries;
 using DevNotes.Application.Interfaces;
+using DevNotes.Application.Mappers;
 using DevNotes.Domain.Entities;
 using MediatR;
 using System.Collections.Generic;
@@ -8,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace DevNotes.Application.Notes.Queries
 {
-    public class GetAllNotesQueryHandler : IRequestHandler<GetAllNotesQuery, List<Note>>
+    public class GetAllNotesQueryHandler : IRequestHandler<GetAllNotesQuery, List<NoteDto>>
     {
         private readonly INoteRepository _noteRepository;
 
@@ -17,11 +19,11 @@ namespace DevNotes.Application.Notes.Queries
             _noteRepository = noteRepository;
         }
 
-        public async Task<List<Note>> Handle(GetAllNotesQuery request, CancellationToken cancellationToken)
+        public async Task<List<NoteDto>> Handle(GetAllNotesQuery request, CancellationToken cancellationToken)
         {
-            return await _noteRepository.GetAllAsync(cancellationToken);
+            var notes = await _noteRepository.GetAllAsync(cancellationToken);
+            return notes.Select(NoteMapper.ToDto).ToList();
         }
     }
 
-}
 }
