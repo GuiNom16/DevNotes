@@ -1,5 +1,5 @@
 import React from 'react';
-import NotesPage from './features/notes/NotesPage';
+import NotesPage from './features/notes/components/NotesPage';
 
 const App: React.FC = () => {
   return <NotesPage />;

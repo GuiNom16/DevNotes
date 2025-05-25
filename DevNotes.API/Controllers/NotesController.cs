@@ -24,7 +24,8 @@ namespace DevNotes.API.Controllers
         public async Task<IActionResult> CreateNote([FromBody] CreateNoteCommand command)
         {
             var noteId = await _mediator.Send(command);
-            return CreatedAtAction(nameof(GetNoteById), new { id = noteId }, null);
+            var createdNote = await _mediator.Send(new GetNoteByIdQuery(noteId));
+            return CreatedAtAction(nameof(GetNoteById), new { id = noteId }, createdNote);
         }
 
         // GET: api/notes/{id}
@@ -54,7 +55,9 @@ namespace DevNotes.API.Controllers
             var updated = await _mediator.Send(command);
             if (!updated) return NotFound();
 
-            return NoContent();
+            var updatedNote = await _mediator.Send(new GetNoteByIdQuery(id));
+
+            return Ok(updatedNote);
         }
 
         // DELETE: api/notes/{id}

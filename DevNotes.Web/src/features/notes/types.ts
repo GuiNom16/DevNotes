@@ -5,7 +5,13 @@ content: string;
 createdAt: string;
 }
 
-export interface CreateNoteInput {
+export interface NoteCreateDTO  {
+  title: string;
+  content: string;
+}
+
+export interface NoteUpdateDTO {
+  id: string;
   title: string;
   content: string;
 }
