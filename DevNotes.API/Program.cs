@@ -1,8 +1,12 @@
 using DevNotes.Application.Common.Behaviors;
 using DevNotes.Application.Features.Notes.Commands;
+using DevNotes.Application.Features.Notes.Queries;
+using DevNotes.Application.Interfaces;
+using DevNotes.Application.Notes.Queries;
 using DevNotes.Infrastructure.Configuration;
 using DevNotes.Infrastructure.Extensions;
 using DevNotes.Infrastructure.Persistence;
+using DevNotes.Infrastructure.Repositories;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -23,7 +27,11 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddInfrastructure(builder.Configuration);
-builder.Services.AddMediatR(Assembly.Load("DevNotes.Application"));
+
+builder.Services.AddMediatR(typeof(GetAllNotesQueryHandler).Assembly);
+builder.Services.AddScoped<INoteRepository, NoteRepository>();
+
+
 builder.Services.AddValidatorsFromAssemblyContaining<CreateNoteCommandValidator>();
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 builder.Services.AddDbContext<NotesDbContext>(options =>
@@ -51,7 +59,11 @@ builder.Services.AddAuthentication(options =>
 
 
 
-var app = builder.Build();
+
+    var app = builder.Build();
+
+
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
