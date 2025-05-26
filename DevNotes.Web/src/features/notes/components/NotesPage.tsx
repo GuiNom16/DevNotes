@@ -63,7 +63,6 @@ const NotesPage: React.FC = () => {
 
   return (
     <div>
-      <h1>DevNotes</h1>
       <CreateNoteForm
         onCreate={handleCreateNote}
         onUpdate={handleUpdateNote}
