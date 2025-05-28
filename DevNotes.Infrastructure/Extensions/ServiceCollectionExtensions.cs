@@ -1,6 +1,9 @@
-﻿using DevNotes.Infrastructure.Persistence;
+﻿using DevNotes.Application.Interfaces;
+using DevNotes.Infrastructure.Persistence;
+using DevNotes.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Http;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DevNotes.Infrastructure.Extensions
@@ -14,7 +17,8 @@ namespace DevNotes.Infrastructure.Extensions
             services.AddDbContext<NotesDbContext>(options =>
                 options.UseNpgsql(connectionString));
 
-            // Add other infrastructure services here (e.g. logging, file storage, etc.)
+            // Ensure the AddHttpClient extension method is available  
+            services.AddHttpClient<ITagSuggestionService, TagSuggestionService>();
 
             return services;
         }

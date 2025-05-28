@@ -1,6 +1,5 @@
 ﻿using DevNotes.Application.DTOs;
 using DevNotes.Domain.Entities;
-using System;
 
 namespace DevNotes.Application.Mappers
 {
@@ -10,14 +9,15 @@ namespace DevNotes.Application.Mappers
         {
             if (note == null) return null;
 
-                return new NoteDto
-        {
-            Id = note.Id,
-            Title = note.Title,
-            Content = note.Content,
-            CreatedAt = note.CreatedAt,
-            UpdatedAt = note.UpdatedAt
-        };
+            return new NoteDto
+            {
+                Id = note.Id,
+                Title = note.Title,
+                Content = note.Content,
+                CreatedAt = note.CreatedAt,
+                UpdatedAt = note.UpdatedAt,
+                Tags = note.Tags?.Select(t => t.Name).ToList() ?? new List<string>()
+            };
         }
 
         public static Note ToEntity(NoteDto dto)
@@ -30,7 +30,8 @@ namespace DevNotes.Application.Mappers
                 Title = dto.Title,
                 Content = dto.Content,
                 CreatedAt = dto.CreatedAt,
-                UpdatedAt = dto.UpdatedAt
+                UpdatedAt = dto.UpdatedAt,
+                Tags = dto.Tags?.Select(name => new Tag { Name = name }).ToList() ?? new List<Tag>()
             };
         }
     }

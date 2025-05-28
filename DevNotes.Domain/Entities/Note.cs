@@ -13,6 +13,7 @@ namespace DevNotes.Domain.Entities
         public string Title { get; set; } = string.Empty;
 
         public string Content { get; set; } = string.Empty;
+        public ICollection<Tag> Tags { get; set; } = [];
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

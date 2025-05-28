@@ -1,5 +1,6 @@
 ﻿using DevNotes.Application.Features.Notes.Commands;
 using DevNotes.Application.Features.Notes.Queries;
+using DevNotes.Application.Interfaces;
 using DevNotes.Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -13,10 +14,12 @@ namespace DevNotes.API.Controllers
     public class NotesController : ControllerBase
     {
         private readonly IMediator _mediator;
+        private readonly ITagAssociationService _tagAssociationService;
 
-        public NotesController(IMediator mediator)
+        public NotesController(IMediator mediator, ITagAssociationService tagAssociationService)
         {
             _mediator = mediator;
+            _tagAssociationService = tagAssociationService;
         }
 
         // POST: api/notes
@@ -69,6 +72,17 @@ namespace DevNotes.API.Controllers
 
             return NoContent();
         }
+
+        // POST: api/notes/{noteId}/tags
+        [HttpPost("{noteId}/tags")]
+        public async Task<IActionResult> AssignTags(Guid noteId, [FromBody] List<string> tagNames, CancellationToken cancellationToken)
+        {
+            await _tagAssociationService.AssociateTagsToNoteAsync(noteId, tagNames, cancellationToken);
+            return Ok();
+        }
+
+
+
     }
 }
 

@@ -7,6 +7,7 @@ using DevNotes.Infrastructure.Configuration;
 using DevNotes.Infrastructure.Extensions;
 using DevNotes.Infrastructure.Persistence;
 using DevNotes.Infrastructure.Repositories;
+using DevNotes.Infrastructure.Services;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -30,7 +31,8 @@ builder.Services.AddInfrastructure(builder.Configuration);
 
 builder.Services.AddMediatR(typeof(GetAllNotesQueryHandler).Assembly);
 builder.Services.AddScoped<INoteRepository, NoteRepository>();
-
+builder.Services.AddScoped<ITagAssociationService, TagAssociationService>();
+builder.Services.AddHttpClient<ISummarizationService, SummarizationService>();
 
 builder.Services.AddValidatorsFromAssemblyContaining<CreateNoteCommandValidator>();
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
