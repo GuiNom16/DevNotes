@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import SummaryPanel from "./SummaryPanel"; // Adjust path accordingly
+import SummaryPanel from "./SummaryPanel";
 import type { NoteCreateDTO, NoteDTO, NoteUpdateDTO } from "../types";
 import TagSuggestionModal from "./TagSuggestionModal";
 
@@ -9,6 +9,11 @@ interface CreateNoteFormProps {
   initialData?: NoteDTO;
   isEditing?: boolean;
   onCancel?: () => void;
+  onSuggestTags?: () => Promise<string[]>; // new prop to fetch suggested tags
+  suggestedTags?: string[]; // optional pre-fetched tags (not used here but kept for completeness)
+  onAssignTags?: (tags: string[]) => void; // assign tags to note
+  tagLoading?: boolean;
+  tagError?: string | null;
 }
 
 const CreateNoteForm: React.FC<CreateNoteFormProps> = ({
@@ -17,17 +22,22 @@ const CreateNoteForm: React.FC<CreateNoteFormProps> = ({
   initialData,
   isEditing = false,
   onCancel,
+  onSuggestTags,
+  onAssignTags,
+  tagLoading,
+  tagError,
 }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // States for Tag suggestion
+  // Tags state
   const [tags, setTags] = useState<string[]>([]);
   const [isTagModalOpen, setIsTagModalOpen] = useState(false);
+  const [modalSuggestedTags, setModalSuggestedTags] = useState<string[]>([]);
 
-  // New states for summary panel
+  // Summary panel states (unchanged)
   const [isSummaryOpen, setIsSummaryOpen] = useState(false);
   const [summary, setSummary] = useState("");
   const [summaryLoading, setSummaryLoading] = useState(false);
@@ -37,20 +47,20 @@ const CreateNoteForm: React.FC<CreateNoteFormProps> = ({
     if (initialData) {
       setTitle(initialData.title);
       setContent(initialData.content);
+      setTags(initialData.tags ?? []);
     } else {
       setTitle("");
       setContent("");
+      setTags([]);
     }
   }, [initialData]);
 
-  // Simulate AI call for summary (replace with your API)
+  // Generate summary (unchanged)
   const generateSummary = async (text: string) => {
     setSummaryLoading(true);
     setSummaryError(null);
     try {
-      // Simulated delay and summary
       await new Promise((r) => setTimeout(r, 1500));
-      // Simple fake summary for demo:
       const fakeSummary = text.length > 100 ? text.slice(0, 100) + "..." : text;
       setSummary(fakeSummary);
     } catch (e) {
@@ -70,26 +80,7 @@ const CreateNoteForm: React.FC<CreateNoteFormProps> = ({
     setIsSummaryOpen(false);
   };
 
-  // const handleSubmit = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   setLoading(true);
-  //   setError(null);
-
-  //   try {
-  //     if (isEditing && onUpdate && initialData) {
-  //       await onUpdate({ id: initialData.id, title, content });
-  //     } else {
-  //       await onCreate({ title, content });
-  //     }
-  //     setTitle("");
-  //     setContent("");
-  //   } catch (err) {
-  //     setError((err as Error).message);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
+  // Submit handler (unchanged)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -103,7 +94,7 @@ const CreateNoteForm: React.FC<CreateNoteFormProps> = ({
       }
       setTitle("");
       setContent("");
-      setTags([]); // clear tags after submit
+      setTags([]);
     } catch (err) {
       setError((err as Error).message);
     } finally {
@@ -111,12 +102,34 @@ const CreateNoteForm: React.FC<CreateNoteFormProps> = ({
     }
   };
 
+  // Add tags helper (local update + propagate)
   const addTags = (newTags: string[]) => {
     setTags((prev) => {
       const setPrev = new Set(prev);
       newTags.forEach((t) => setPrev.add(t));
       return Array.from(setPrev);
     });
+
+    // Also call onAssignTags if editing and prop is provided
+    if (isEditing && onAssignTags) {
+      onAssignTags(newTags);
+    }
+  };
+
+  // New handler for Add Tag button click
+  const handleAddTagClick = async () => {
+    if (onSuggestTags) {
+      try {
+        const suggested = await onSuggestTags();
+        setModalSuggestedTags(suggested);
+      } catch {
+        setModalSuggestedTags([]);
+      }
+    } else {
+      // fallback: empty suggested tags
+      setModalSuggestedTags([]);
+    }
+    setIsTagModalOpen(true);
   };
 
   return (
@@ -200,15 +213,21 @@ const CreateNoteForm: React.FC<CreateNoteFormProps> = ({
           </button>
           <button
             type="button"
-            onClick={() => setIsTagModalOpen(true)}
+            onClick={handleAddTagClick}
+            disabled={tagLoading}
             className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded transition"
           >
-            Add Tag
+            {tagLoading ? "Loading Tags..." : "Add Tag"}
           </button>
         </div>
         {error && (
           <p className="mt-4 text-red-600 dark:text-red-400 font-medium">
             {error}
+          </p>
+        )}
+        {tagError && (
+          <p className="mt-2 text-red-600 dark:text-red-400 font-medium">
+            {tagError}
           </p>
         )}
       </form>
@@ -225,9 +244,12 @@ const CreateNoteForm: React.FC<CreateNoteFormProps> = ({
 
       <TagSuggestionModal
         isOpen={isTagModalOpen}
-        noteContent={content}
         onClose={() => setIsTagModalOpen(false)}
-        onAddTags={addTags}
+        suggestedTags={modalSuggestedTags}
+        onAddSelected={(selectedTags) => {
+          addTags(selectedTags);
+          setIsTagModalOpen(false);
+        }}
       />
     </>
   );
