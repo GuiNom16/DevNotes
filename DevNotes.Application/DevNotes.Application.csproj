@@ -17,4 +17,9 @@
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="11.1.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Features\Summurization\Commands\" />
+    <Folder Include="Features\Tags\Queries\" />
+  </ItemGroup>
+
 </Project>

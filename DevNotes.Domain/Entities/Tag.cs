@@ -5,11 +5,9 @@ namespace DevNotes.Domain.Entities
 {
     public class Tag
     {
-        public Guid Id { get; set; } // Primary key
-
+        public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
-
-        // Navigation property for notes that have this tag
-        public ICollection<Note> Notes { get; set; } = [];
+        public ICollection<Note> Notes { get; set; } = new List<Note>(); // Many-to-many
     }
+
 }

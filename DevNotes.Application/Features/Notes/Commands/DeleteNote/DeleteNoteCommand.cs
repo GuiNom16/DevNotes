@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DevNotes.Application.Features.Notes.Commands
+namespace DevNotes.Application.Features.Notes.Commands.DeleteNote
 {
     public record DeleteNoteCommand(Guid Id) : IRequest<bool>;
 }

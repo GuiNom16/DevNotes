@@ -1,5 +1,5 @@
-﻿using DevNotes.Application.Interfaces;
-using DevNotes.Infrastructure.Services;
+﻿using DevNotes.Application.Features.TagSuggestions.Queries.SuggestTags;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DevNotes.Api.Controllers
@@ -8,11 +8,16 @@ namespace DevNotes.Api.Controllers
     [Route("api/[controller]")]
     public class TagSuggestionsController : ControllerBase
     {
-        private readonly ITagSuggestionService _tagSuggestionService;
+        private readonly IMediator _mediator;
 
-        public TagSuggestionsController(ITagSuggestionService tagSuggestionService)
+        public TagSuggestionsController(IMediator mediator)
         {
-            _tagSuggestionService = tagSuggestionService;
+            _mediator = mediator;
+        }
+
+        public class TagSuggestionRequest
+        {
+            public string Text { get; set; } = string.Empty;
         }
 
         [HttpPost("suggest")]
@@ -21,13 +26,10 @@ namespace DevNotes.Api.Controllers
             if (string.IsNullOrWhiteSpace(request.Text))
                 return BadRequest("Text is required.");
 
-            var suggestedTags = await _tagSuggestionService.SuggestTagsAsync(request.Text, cancellationToken);
-            return Ok(suggestedTags);
-        }
+            var query = new SuggestTagsQuery(request.Text);
+            var suggestedTags = await _mediator.Send(query, cancellationToken);
 
-        public class TagSuggestionRequest
-        {
-            public string Text { get; set; } = string.Empty;
+            return Ok(suggestedTags);
         }
     }
 }

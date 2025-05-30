@@ -1,6 +1,8 @@
 ﻿using DevNotes.Application.Features.Notes.Commands;
+using DevNotes.Application.Features.Notes.Commands.CreateNote;
 using DevNotes.Application.Interfaces;
 using DevNotes.Domain.Entities;
+using DevNotes.Domain.Interfaces;
 using FluentAssertions;
 using Moq;
 using System.Threading;

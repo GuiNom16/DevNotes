@@ -11,11 +11,11 @@ public class SummarizationService : ISummarizationService
         _httpClient = httpClient;
     }
 
-    public async Task<string> SummarizeAsync(string content, CancellationToken cancellationToken = default)
+    public async Task<string> SummarizeAsync(string text, CancellationToken cancellationToken = default)
     {
         try
         {
-            var response = await _httpClient.PostAsJsonAsync(_summaryApiUrl, new { text = content }, cancellationToken);
+            var response = await _httpClient.PostAsJsonAsync(_summaryApiUrl, new { text = text }, cancellationToken);
             response.EnsureSuccessStatusCode();
 
             var result = await response.Content.ReadFromJsonAsync<SummaryResponse>(cancellationToken: cancellationToken);

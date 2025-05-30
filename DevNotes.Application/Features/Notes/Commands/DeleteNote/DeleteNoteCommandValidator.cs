@@ -1,7 +1,6 @@
-﻿using DevNotes.Application.Features.Notes.Commands;
-using FluentValidation;
+﻿using FluentValidation;
 
-namespace DevNotes.Application.Features.Notes.Commands;
+namespace DevNotes.Application.Features.Notes.Commands.DeleteNote;
 
 public class DeleteNoteCommandValidator : AbstractValidator<DeleteNoteCommand>
 {

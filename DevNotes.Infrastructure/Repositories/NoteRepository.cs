@@ -1,5 +1,6 @@
 ﻿using DevNotes.Application.Interfaces;
 using DevNotes.Domain.Entities;
+using DevNotes.Domain.Interfaces;
 using DevNotes.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -32,7 +33,9 @@ namespace DevNotes.Infrastructure.Repositories
 
         public async Task<List<Note>> GetAllAsync(CancellationToken cancellationToken)
         {
-            return await _context.Notes.ToListAsync(cancellationToken);
+            return await _context.Notes
+            .Include(n => n.Tags)  // Include tags eagerly
+            .ToListAsync(cancellationToken);
         }
 
         public async Task UpdateAsync(Note note)

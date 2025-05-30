@@ -2,6 +2,7 @@
 using DevNotes.Application.Interfaces;
 using DevNotes.Application.Notes.Queries;
 using DevNotes.Domain.Entities;
+using DevNotes.Domain.Interfaces;
 using FluentAssertions;
 using Moq;
 using System.Collections.Generic;

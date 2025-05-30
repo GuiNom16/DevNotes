@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DevNotes.Application.Features.Notes.Commands
+namespace DevNotes.Application.Features.Notes.Commands.UpdateNote
 {
     public record UpdateNoteCommand(Guid Id, string Title, string Content) : IRequest<bool>;
 }

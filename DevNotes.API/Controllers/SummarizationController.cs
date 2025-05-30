@@ -1,4 +1,5 @@
-﻿using DevNotes.Application.Interfaces;
+﻿using DevNotes.Application.Features.Summurization.Queries.SummurizeText;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DevNotes.Api.Controllers
@@ -7,11 +8,16 @@ namespace DevNotes.Api.Controllers
     [Route("api/[controller]")]
     public class SummarizationController : ControllerBase
     {
-        private readonly ISummarizationService _summarizationService;
+        private readonly IMediator _mediator;
 
-        public SummarizationController(ISummarizationService summarizationService)
+        public SummarizationController(IMediator mediator)
         {
-            _summarizationService = summarizationService;
+            _mediator = mediator;
+        }
+
+        public class SummarizationRequest
+        {
+            public string Text { get; set; } = string.Empty;
         }
 
         [HttpPost("summarize")]
@@ -20,13 +26,10 @@ namespace DevNotes.Api.Controllers
             if (string.IsNullOrWhiteSpace(request.Text))
                 return BadRequest("Text is required.");
 
-            var summary = await _summarizationService.SummarizeAsync(request.Text, cancellationToken);
-            return Ok(new { summary });
-        }
+            var query = new SummarizeTextQuery(request.Text);
+            var summary = await _mediator.Send(query, cancellationToken);
 
-        public class SummarizationRequest
-        {
-            public string Text { get; set; } = string.Empty;
+            return Ok(new { summary });
         }
     }
 }

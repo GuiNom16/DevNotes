@@ -2,6 +2,8 @@
 using DevNotes.Infrastructure.Persistence;
 using DevNotes.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using DevNotes.Application.Common.Exceptions;
+
 
 namespace DevNotes.Infrastructure.Services
 {
@@ -40,5 +42,22 @@ namespace DevNotes.Infrastructure.Services
 
             await _context.SaveChangesAsync(cancellationToken);
         }
+
+        public async Task RemoveTagFromNoteAsync(Guid noteId, string tagName, CancellationToken cancellationToken)
+        {
+            var note = await _context.Notes
+                .Include(n => n.Tags)
+                .FirstOrDefaultAsync(n => n.Id == noteId, cancellationToken);
+
+            if (note == null) throw new NotFoundException(nameof(Note), noteId);
+
+            var tag = note.Tags.FirstOrDefault(t => t.Name == tagName);
+            if (tag != null)
+            {
+                note.Tags.Remove(tag);
+                await _context.SaveChangesAsync(cancellationToken);
+            }
+        }
+
     }
 }

@@ -1,11 +1,11 @@
-﻿using DevNotes.Application.Interfaces;
-using DevNotes.Domain.Entities;
+﻿using DevNotes.Domain.Entities;
+using DevNotes.Domain.Interfaces;
 using MediatR;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DevNotes.Application.Features.Notes.Commands
+namespace DevNotes.Application.Features.Notes.Commands.CreateNote
 {
     public class CreateNoteCommandHandler : IRequestHandler<CreateNoteCommand, Guid>
     {

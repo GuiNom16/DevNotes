@@ -1,10 +1,10 @@
-﻿using DevNotes.Application.Features.Notes.Commands;
-using DevNotes.Application.Interfaces;
+﻿using DevNotes.Application.Interfaces;
+using DevNotes.Domain.Interfaces;
 using MediatR;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DevNotes.Application.Features.Notes.Commands
+namespace DevNotes.Application.Features.Notes.Commands.DeleteNote
 {
     public class DeleteNoteCommandHandler : IRequestHandler<DeleteNoteCommand, bool>
     {

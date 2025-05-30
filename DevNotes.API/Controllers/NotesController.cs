@@ -1,5 +1,9 @@
-﻿using DevNotes.Application.Features.Notes.Commands;
+﻿using DevNotes.Application.Features.Notes.Commands.CreateNote;
+using DevNotes.Application.Features.Notes.Commands.DeleteNote;
+using DevNotes.Application.Features.Notes.Commands.UpdateNote;
 using DevNotes.Application.Features.Notes.Queries;
+using DevNotes.Application.Features.Tags.Commands.AssignTagsToNote;
+using DevNotes.Application.Features.Tags.Commands.RemoveTagFromNote;
 using DevNotes.Application.Interfaces;
 using DevNotes.Domain.Entities;
 using MediatR;
@@ -73,14 +77,31 @@ namespace DevNotes.API.Controllers
             return NoContent();
         }
 
-        // POST: api/notes/{noteId}/tags
         [HttpPost("{noteId}/tags")]
         public async Task<IActionResult> AssignTags(Guid noteId, [FromBody] List<string> tagNames, CancellationToken cancellationToken)
         {
-            await _tagAssociationService.AssociateTagsToNoteAsync(noteId, tagNames, cancellationToken);
+            var command = new AssignTagsToNoteCommand
+            {
+                NoteId = noteId,
+                TagNames = tagNames
+            };
+
+            await _mediator.Send(command, cancellationToken);
             return Ok();
         }
 
+        [HttpDelete("{noteId}/tags/{tagName}")]
+        public async Task<IActionResult> RemoveTag(Guid noteId, string tagName, CancellationToken cancellationToken)
+        {
+            var command = new RemoveTagFromNoteCommand
+            {
+                NoteId = noteId,
+                TagName = tagName
+            };
+
+            await _mediator.Send(command, cancellationToken);
+            return NoContent();
+        }
 
 
     }
