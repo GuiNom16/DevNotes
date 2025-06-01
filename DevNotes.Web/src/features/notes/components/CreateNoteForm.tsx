@@ -4,16 +4,19 @@ import type { NoteCreateDTO, NoteDTO, NoteUpdateDTO } from "../types";
 import TagSuggestionModal from "./TagSuggestionModal";
 
 interface CreateNoteFormProps {
-  onCreate: (note: NoteCreateDTO) => void;
-  onUpdate?: (note: NoteUpdateDTO) => void;
+  onCreate: (note: NoteCreateDTO) => Promise<NoteDTO>;
+  onUpdate?: (note: NoteUpdateDTO) => Promise<NoteDTO>;
   initialData?: NoteDTO;
   isEditing?: boolean;
   onCancel?: () => void;
-  onSuggestTags?: () => Promise<string[]>; // new prop to fetch suggested tags
-  suggestedTags?: string[]; // optional pre-fetched tags (not used here but kept for completeness)
-  onAssignTags?: (tags: string[]) => void; // assign tags to note
+  onBeautify?: () => Promise<string>;
+  onSuggestTags?: () => Promise<string[]>;
+  suggestedTags?: string[];
+  onAssignTags?: (tags: string[]) => void;
+  onRemoveTag?: (tag: string) => void;
   tagLoading?: boolean;
   tagError?: string | null;
+  allExistingTags: string[];
 }
 
 const CreateNoteForm: React.FC<CreateNoteFormProps> = ({
@@ -22,14 +25,18 @@ const CreateNoteForm: React.FC<CreateNoteFormProps> = ({
   initialData,
   isEditing = false,
   onCancel,
+  onBeautify,
   onSuggestTags,
   onAssignTags,
+  onRemoveTag,
   tagLoading,
   tagError,
+  allExistingTags,
 }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
+  const [beautifyLoading, setBeautifyLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Tags state
@@ -37,7 +44,7 @@ const CreateNoteForm: React.FC<CreateNoteFormProps> = ({
   const [isTagModalOpen, setIsTagModalOpen] = useState(false);
   const [modalSuggestedTags, setModalSuggestedTags] = useState<string[]>([]);
 
-  // Summary panel states (unchanged)
+  // Summary panel states
   const [isSummaryOpen, setIsSummaryOpen] = useState(false);
   const [summary, setSummary] = useState("");
   const [summaryLoading, setSummaryLoading] = useState(false);
@@ -47,10 +54,12 @@ const CreateNoteForm: React.FC<CreateNoteFormProps> = ({
     if (initialData) {
       setTitle(initialData.title);
       setContent(initialData.content);
+      console.log("Setting tags to: ", initialData.tags);
       setTags(initialData.tags ?? []);
     } else {
       setTitle("");
       setContent("");
+      console.log("this running");
       setTags([]);
     }
   }, [initialData]);
@@ -81,22 +90,45 @@ const CreateNoteForm: React.FC<CreateNoteFormProps> = ({
   };
 
   // Submit handler (unchanged)
-  const handleSubmit = async (e: React.FormEvent) => {
+  const [localIsEditing, setLocalIsEditing] = useState(isEditing);
+  const [lastSavedNote, setLastSavedNote] = useState<NoteDTO | null>(
+    initialData ?? null
+  );
+
+  useEffect(() => {
+    setLocalIsEditing(isEditing);
+  }, [isEditing]);
+
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-
     try {
-      if (isEditing && onUpdate && initialData) {
-        await onUpdate({ id: initialData.id, title, content, tags });
+      if (localIsEditing && onUpdate && initialData) {
+        const updatedNote = await onUpdate({
+          id: initialData.id,
+          title,
+          content,
+          tags,
+        });
+        setTitle(updatedNote.title);
+        setContent(updatedNote.content);
+        console.log("this running");
+        setTags(updatedNote.tags ?? []);
+        setLastSavedNote(updatedNote); // ⬅️ Track last saved state
+        setLocalIsEditing(true);
       } else {
-        await onCreate({ title, content, tags });
+        const createdNote = await onCreate({ title, content, tags });
+        setTitle(createdNote.title);
+        setContent(createdNote.content);
+        console.log("this running");
+
+        setTags(createdNote.tags ?? []);
+        setLastSavedNote(createdNote); // ⬅️ Track newly created note
+        setLocalIsEditing(true); // ⬅️ Switch to edit mode
       }
-      setTitle("");
-      setContent("");
-      setTags([]);
-    } catch (err) {
-      setError((err as Error).message);
+    } catch (err: any) {
+      setError(err.message || "Error occurred");
     } finally {
       setLoading(false);
     }
@@ -107,6 +139,7 @@ const CreateNoteForm: React.FC<CreateNoteFormProps> = ({
     setTags((prev) => {
       const setPrev = new Set(prev);
       newTags.forEach((t) => setPrev.add(t));
+      console.log(Array.from(setPrev));
       return Array.from(setPrev);
     });
 
@@ -132,6 +165,13 @@ const CreateNoteForm: React.FC<CreateNoteFormProps> = ({
     setIsTagModalOpen(true);
   };
 
+  const isUnchanged =
+    localIsEditing &&
+    lastSavedNote &&
+    title === lastSavedNote.title &&
+    content === lastSavedNote.content &&
+    JSON.stringify(tags) === JSON.stringify(lastSavedNote.tags ?? []);
+
   return (
     <>
       <h2 className="mt-8 text-2xl font-semibold mb-4 text-center">
@@ -139,9 +179,9 @@ const CreateNoteForm: React.FC<CreateNoteFormProps> = ({
       </h2>
       <form
         onSubmit={handleSubmit}
-        className="max-w-4xl w-full mx-auto p-8 rounded-lg shadow-lg
-                   bg-gray-100 text-gray-900
-                   dark:bg-zinc-800 dark:text-gray-100 relative"
+        className="w-full max-w-7xl mx-auto p-10 rounded-lg shadow-2xl
+             bg-gray-100 text-gray-900
+             dark:bg-zinc-800 dark:text-gray-100 relative"
       >
         <input
           type="text"
@@ -150,25 +190,40 @@ const CreateNoteForm: React.FC<CreateNoteFormProps> = ({
           onChange={(e) => setTitle(e.target.value)}
           required
           className="w-full mb-4 p-3 rounded border border-gray-300 bg-white text-gray-900 placeholder-gray-500
-                     focus:outline-none focus:ring-2 focus:ring-amber-500
-                     dark:border-zinc-600 dark:bg-zinc-900 dark:text-gray-100 dark:placeholder-gray-400"
+             focus:outline-none focus:ring-2 focus:ring-amber-500
+             dark:border-zinc-600 dark:bg-zinc-900 dark:text-gray-100 dark:placeholder-gray-400
+             text-xl font-bold"
         />
+
         <textarea
           placeholder="Write your note here..."
           value={content}
           onChange={(e) => setContent(e.target.value)}
           required
-          className="w-full h-48 p-3 rounded border border-gray-300 bg-white text-gray-900 placeholder-gray-500
-                     focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none
-                     dark:border-zinc-600 dark:bg-zinc-900 dark:text-gray-100 dark:placeholder-gray-400"
+          className="w-full h-124 p-3 rounded border border-gray-300 bg-white text-gray-900 placeholder-gray-500
+             focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none
+             dark:border-zinc-600 dark:bg-zinc-900 dark:text-gray-100 dark:placeholder-gray-400"
         />
+        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          {content.length} characters
+        </p>
+
         <div className="mt-2 flex flex-wrap gap-2">
           {tags.map((tag) => (
             <span
               key={tag}
-              className="bg-amber-500 text-amber-900 dark:bg-amber-400 dark:text-amber-900 px-2 py-0.5 rounded-full text-sm select-none"
+              className="flex items-center bg-amber-500 text-amber-900 dark:bg-amber-400 dark:text-amber-900 px-2 py-0.5 rounded-full text-sm select-none"
             >
               {tag}
+              <button
+                type="button"
+                onClick={() => onRemoveTag && onRemoveTag(tag)} // Use prop callback here
+                className="ml-2 text-amber-900 dark:text-amber-900 hover:text-amber-700 dark:hover:text-amber-600
+                 font-bold rounded-full focus:outline-none focus:ring-1 focus:ring-amber-700"
+                aria-label={`Remove tag ${tag}`}
+              >
+                ×
+              </button>
             </span>
           ))}
         </div>
@@ -176,50 +231,77 @@ const CreateNoteForm: React.FC<CreateNoteFormProps> = ({
         <div className="mt-6 flex items-center space-x-4">
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || Boolean(localIsEditing && isUnchanged)}
             className="px-6 py-2 rounded transition disabled:opacity-50
-                       bg-amber-500 hover:bg-amber-600 text-white
-                       dark:bg-amber-600 dark:hover:bg-amber-700"
+           bg-amber-500 hover:bg-amber-600 text-white
+           dark:bg-amber-600 dark:hover:bg-amber-700"
           >
             {loading
-              ? isEditing
+              ? localIsEditing
                 ? "Updating..."
                 : "Creating..."
-              : isEditing
+              : localIsEditing
               ? "Update Note"
               : "Create Note"}
           </button>
+
           {isEditing && onCancel && (
             <button
               type="button"
               onClick={onCancel}
               disabled={loading}
               className="px-6 py-2 rounded transition disabled:opacity-50
-                         border border-gray-300 text-gray-700 hover:bg-gray-200
-                         dark:border-zinc-600 dark:text-gray-200 dark:hover:bg-zinc-700"
+                 border border-gray-300 text-gray-700 hover:bg-gray-200
+                 dark:border-zinc-600 dark:text-gray-200 dark:hover:bg-zinc-700"
             >
               Cancel
             </button>
           )}
+
           <button
             type="button"
             onClick={handleSummarizeClick}
             disabled={summaryLoading}
             className="px-4 py-2 rounded transition disabled:opacity-50
-                       bg-indigo-500 hover:bg-indigo-600 text-white
-                       dark:bg-indigo-600 dark:hover:bg-indigo-700"
+               bg-indigo-500 hover:bg-indigo-600 text-white
+               dark:bg-indigo-600 dark:hover:bg-indigo-700"
           >
-            {summaryLoading ? "Summarizing..." : "Summarize"}
+            🧠 {summaryLoading ? "Summarizing..." : "Summarize"}
           </button>
+
+          <button
+            type="button"
+            onClick={async () => {
+              if (onBeautify) {
+                setBeautifyLoading(true);
+                try {
+                  const newContent = await onBeautify();
+                  setContent(newContent);
+                } catch (err) {
+                  console.log("Error: ", err);
+                } finally {
+                  setBeautifyLoading(false);
+                }
+              }
+            }}
+            disabled={!onBeautify || beautifyLoading}
+            className="px-4 py-2 rounded transition disabled:opacity-50
+     bg-purple-600 hover:bg-purple-700 text-white
+     dark:bg-purple-700 dark:hover:bg-purple-800"
+          >
+            ✨ {beautifyLoading ? "Beautifying..." : "Beautify"}
+          </button>
+
           <button
             type="button"
             onClick={handleAddTagClick}
             disabled={tagLoading}
             className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded transition"
           >
-            {tagLoading ? "Loading Tags..." : "Add Tag"}
+            🏷️ {tagLoading ? "Loading Tags..." : "Add Tag"}
           </button>
         </div>
+
         {error && (
           <p className="mt-4 text-red-600 dark:text-red-400 font-medium">
             {error}
@@ -246,6 +328,8 @@ const CreateNoteForm: React.FC<CreateNoteFormProps> = ({
         isOpen={isTagModalOpen}
         onClose={() => setIsTagModalOpen(false)}
         suggestedTags={modalSuggestedTags}
+        allTags={allExistingTags}
+        selectedTags={tags}
         onAddSelected={(selectedTags) => {
           addTags(selectedTags);
           setIsTagModalOpen(false);

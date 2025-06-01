@@ -1,5 +1,6 @@
 import React from "react";
 import { Moon, Sun, LogIn, LogOut } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface HeaderProps {
   isDarkMode: boolean;
@@ -14,6 +15,13 @@ const Header: React.FC<HeaderProps> = ({
   isSignedIn,
   onAuthToggle,
 }) => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    onAuthToggle(); // Optional: If you still want to call this for state update
+    navigate("/wip");
+  };
+
   return (
     <header className="w-full bg-gray-100 text-zinc-800 dark:bg-zinc-900 dark:text-gray-100 px-6 py-4 flex items-center justify-between shadow-md transition-colors">
       {/* Left - Logo */}
@@ -30,7 +38,7 @@ const Header: React.FC<HeaderProps> = ({
         </button>
 
         <button
-          onClick={onAuthToggle}
+          onClick={isSignedIn ? handleLogout : onAuthToggle}
           className="p-2 rounded hover:bg-zinc-200 dark:hover:bg-zinc-700 transition"
           title={isSignedIn ? "Sign Out" : "Sign In"}
         >
