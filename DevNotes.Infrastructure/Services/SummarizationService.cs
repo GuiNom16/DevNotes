@@ -4,7 +4,7 @@ using System.Net.Http.Json;
 public class SummarizationService : ISummarizationService
 {
     private readonly HttpClient _httpClient;
-    private readonly string _summaryApiUrl = "http://127.0.0.1:5000/summarize-content";
+    private readonly string _summaryApiUrl = "http://127.0.0.1:5000/summary";
 
     public SummarizationService(HttpClient httpClient)
     {

@@ -1,5 +1,5 @@
 ﻿using DevNotes.Application.Interfaces;
-using DevNotes.Domain.Interfaces;
+using DevNotes.Application.Interfaces;
 using MediatR;
 using System.Threading;
 using System.Threading.Tasks;

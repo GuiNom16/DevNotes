@@ -1,6 +1,6 @@
 ﻿using DevNotes.Application.DTOs;
 using DevNotes.Application.Mappers;
-using DevNotes.Domain.Interfaces;
+using DevNotes.Application.Interfaces;
 using MediatR;
 
 namespace DevNotes.Application.Features.Notes.Queries

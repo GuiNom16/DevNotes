@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MediatR;
 
-namespace DevNotes.Application.Features.Summurization.Queries.SummurizeText
+namespace DevNotes.Application.Features.Summarization.Queries.SummarizeText
 {
     public class SummarizeTextQuery : IRequest<string>
     {

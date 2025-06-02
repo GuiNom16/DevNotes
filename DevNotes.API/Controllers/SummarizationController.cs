@@ -1,4 +1,4 @@
-﻿using DevNotes.Application.Features.Summurization.Queries.SummurizeText;
+﻿using DevNotes.Application.Features.Summarization.Queries.SummarizeText;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

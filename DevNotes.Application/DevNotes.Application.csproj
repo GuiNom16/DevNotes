@@ -19,7 +19,7 @@
 
   <ItemGroup>
     <Folder Include="Features\Summurization\Commands\" />
-    <Folder Include="Features\Tags\Queries\" />
+    <Folder Include="Features\Summurization\Queries\SummurizeText\" />
   </ItemGroup>
 
 </Project>

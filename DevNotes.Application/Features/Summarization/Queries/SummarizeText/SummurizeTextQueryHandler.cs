@@ -1,8 +1,8 @@
-﻿using DevNotes.Application.Features.Summurization.Queries.SummurizeText;
+﻿using DevNotes.Application.Features.Summarization.Queries.SummarizeText;
 using DevNotes.Application.Interfaces;
 using MediatR;
 
-namespace DevNotes.Application.Features.Summarization.Handlers
+namespace DevNotes.Application.Features.Summarization.Queries.SummarizeText
 {
     public class SummarizeTextQueryHandler : IRequestHandler<SummarizeTextQuery, string>
     {

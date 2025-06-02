@@ -2,7 +2,7 @@
 using DevNotes.Application.Features.Notes.Queries;
 using DevNotes.Application.Mappers;
 using DevNotes.Domain.Entities;
-using DevNotes.Domain.Interfaces;
+using DevNotes.Application.Interfaces;
 using MediatR;
 using System.Collections.Generic;
 using System.Threading;

@@ -1,6 +1,6 @@
 ﻿using DevNotes.Application.Interfaces;
 using DevNotes.Domain.Entities;
-using DevNotes.Domain.Interfaces;
+using DevNotes.Application.Interfaces;
 using DevNotes.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using System;
