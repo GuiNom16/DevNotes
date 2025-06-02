@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import NotesPage from "./features/notes/components/NotesPage";
-import WorkInProgressPage from "./components/WorkInProgressPage";
+import NotesPage from "./pages/NotesPage";
+import WorkInProgressPage from "./pages/WorkInProgressPage";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 

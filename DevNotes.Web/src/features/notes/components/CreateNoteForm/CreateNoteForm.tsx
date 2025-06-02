@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import SummaryPanel from "./SummaryPanel";
-import type { NoteCreateDTO, NoteDTO, NoteUpdateDTO } from "../types";
-import TagSuggestionModal from "./TagSuggestionModal";
+import SummaryPanel from "../SummaryPanel/SummaryPanel";
+import type { NoteCreateDTO, NoteDTO, NoteUpdateDTO } from "../../../../types";
+import TagSuggestionModal from "../TagSuggestionModal/TagSuggestionModal";
 
 interface CreateNoteFormProps {
   onCreate: (note: NoteCreateDTO) => Promise<NoteDTO>;
@@ -54,12 +54,10 @@ const CreateNoteForm: React.FC<CreateNoteFormProps> = ({
     if (initialData) {
       setTitle(initialData.title);
       setContent(initialData.content);
-      console.log("Setting tags to: ", initialData.tags);
       setTags(initialData.tags ?? []);
     } else {
       setTitle("");
       setContent("");
-      console.log("this running");
       setTags([]);
     }
   }, [initialData]);
@@ -113,7 +111,6 @@ const CreateNoteForm: React.FC<CreateNoteFormProps> = ({
         });
         setTitle(updatedNote.title);
         setContent(updatedNote.content);
-        console.log("this running");
         setTags(updatedNote.tags ?? []);
         setLastSavedNote(updatedNote); // ⬅️ Track last saved state
         setLocalIsEditing(true);
@@ -121,7 +118,6 @@ const CreateNoteForm: React.FC<CreateNoteFormProps> = ({
         const createdNote = await onCreate({ title, content, tags });
         setTitle(createdNote.title);
         setContent(createdNote.content);
-        console.log("this running");
 
         setTags(createdNote.tags ?? []);
         setLastSavedNote(createdNote); // ⬅️ Track newly created note
@@ -139,7 +135,6 @@ const CreateNoteForm: React.FC<CreateNoteFormProps> = ({
     setTags((prev) => {
       const setPrev = new Set(prev);
       newTags.forEach((t) => setPrev.add(t));
-      console.log(Array.from(setPrev));
       return Array.from(setPrev);
     });
 
@@ -179,6 +174,7 @@ const CreateNoteForm: React.FC<CreateNoteFormProps> = ({
       </h2>
       <form
         onSubmit={handleSubmit}
+        data-testid="note-form"
         className="w-full max-w-7xl mx-auto p-10 rounded-lg shadow-2xl
              bg-gray-100 text-gray-900
              dark:bg-zinc-800 dark:text-gray-100 relative"
@@ -232,6 +228,7 @@ const CreateNoteForm: React.FC<CreateNoteFormProps> = ({
           <button
             type="submit"
             disabled={loading || Boolean(localIsEditing && isUnchanged)}
+            aria-label={localIsEditing ? "Update Note" : "Create Note"}
             className="px-6 py-2 rounded transition disabled:opacity-50
            bg-amber-500 hover:bg-amber-600 text-white
            dark:bg-amber-600 dark:hover:bg-amber-700"
@@ -248,6 +245,7 @@ const CreateNoteForm: React.FC<CreateNoteFormProps> = ({
           {isEditing && onCancel && (
             <button
               type="button"
+              data-testid="cancel-button"
               onClick={onCancel}
               disabled={loading}
               className="px-6 py-2 rounded transition disabled:opacity-50
@@ -260,6 +258,7 @@ const CreateNoteForm: React.FC<CreateNoteFormProps> = ({
 
           <button
             type="button"
+            data-testid="summarize-button"
             onClick={handleSummarizeClick}
             disabled={summaryLoading}
             className="px-4 py-2 rounded transition disabled:opacity-50

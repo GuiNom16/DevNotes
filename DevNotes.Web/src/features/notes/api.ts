@@ -1,5 +1,5 @@
 // src/features/notes/api.ts
-import type { NoteDTO, NoteCreateDTO, NoteUpdateDTO } from "./types";
+import type { NoteDTO, NoteCreateDTO, NoteUpdateDTO } from "../../types";
 
 const API_URL = "https://localhost:7012/api/notes";
 

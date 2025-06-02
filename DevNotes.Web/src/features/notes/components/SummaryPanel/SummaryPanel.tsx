@@ -30,6 +30,7 @@ const SummaryPanel: React.FC<SummaryPanelProps> = ({
         <h2 className="text-lg font-semibold">AI Summary</h2>
         <button
           onClick={onClose}
+          data-testid="close-button"
           className="hover:text-red-600 dark:hover:text-red-400 transition"
         >
           <X />
@@ -38,7 +39,10 @@ const SummaryPanel: React.FC<SummaryPanelProps> = ({
       <div className="p-4 flex flex-col h-[calc(100%-3.5rem)]">
         {loading ? (
           <div className="flex items-center justify-center flex-1">
-            <Loader className="animate-spin text-amber-600 dark:text-amber-500" />
+            <Loader
+              data-testid="loader"
+              className="animate-spin text-amber-600 dark:text-amber-500"
+            />
           </div>
         ) : error ? (
           <p className="text-red-600 dark:text-red-500">{error}</p>

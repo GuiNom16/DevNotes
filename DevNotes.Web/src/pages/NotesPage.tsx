@@ -10,11 +10,11 @@ import {
   removeTag,
   beautifyNoteContent,
   fetchTags,
-} from "../api";
-import NotesList from "./NotesList";
-import CreateNoteForm from "./CreateNoteForm";
-import ConfirmModal from "../../../components/shared/ConfirmModal"; // Import this near the top
-import FullScreenSpinner from "../../../components/shared/FullScreenSpinner";
+} from "../features/notes/api";
+import NotesList from "../features/notes/components/NotesList/NotesList";
+import CreateNoteForm from "../features/notes/components/CreateNoteForm/CreateNoteForm";
+import ConfirmModal from "../shared/ConfirmModal"; // Import this near the top
+import FullScreenSpinner from "../shared/FullScreenSpinner";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 

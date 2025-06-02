@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import type { NoteDTO } from "../types";
+import type { NoteDTO } from "../../../../types";
 
 interface NotesListProps {
   notes: NoteDTO[];
@@ -73,6 +73,19 @@ const NotesList: React.FC<NotesListProps> = ({
                   <p className="text-gray-700 dark:text-gray-300 text-base whitespace-pre-wrap max-h-40 overflow-y-auto">
                     {note.content}
                   </p>
+
+                  {note.tags?.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-4">
+                      {note.tags.map((tag, idx) => (
+                        <span
+                          key={idx}
+                          className="inline-block bg-indigo-100 text-indigo-700 dark:bg-cyan-900 dark:text-cyan-200 text-sm px-3 py-1 rounded-full"
+                        >
+                          #{tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mt-4">

@@ -74,7 +74,7 @@ const TagSuggestionModal: React.FC<TagSuggestionModalProps> = ({
       (tag) => !selectedTags.includes(tag)
     );
     onAddSelected(newTags);
-    onClose(); // Close modal after add
+    onClose();
   };
 
   const filteredDropdownTags = allTags.filter(
