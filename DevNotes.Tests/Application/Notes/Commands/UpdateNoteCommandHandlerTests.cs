@@ -2,7 +2,7 @@
 using DevNotes.Application.Features.Notes.Commands.UpdateNote;
 using DevNotes.Application.Interfaces;
 using DevNotes.Domain.Entities;
-using DevNotes.Domain.Interfaces;
+using DevNotes.Application.Interfaces;
 using FluentAssertions;
 using Moq;
 using System;
