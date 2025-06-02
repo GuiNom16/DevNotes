@@ -1,6 +1,6 @@
 flask
 transformers
-torch
+keybert
 sentence-transformers
-scikit-learn
-numpy
+nltk
+openai
