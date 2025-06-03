@@ -13,7 +13,7 @@ namespace DevNotes.Application.Features.TagSuggestions.Queries.SuggestTags
         {
             RuleFor(x => x.Text)
                 .NotEmpty().WithMessage("Text must not be empty.")
-                .MaximumLength(1000).WithMessage("Text must not exceed 1000 characters.");
+                .MaximumLength(5000).WithMessage("Text must not exceed 5000 characters.");
         }
     }
 }

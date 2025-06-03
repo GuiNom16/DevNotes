@@ -1,34 +1,50 @@
 ﻿using DevNotes.Application.Interfaces;
-using System.Net.Http.Json;
+using System;
+using System.Net.Http;
+using System.Text;
+using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
 
-public class SummarizationService : ISummarizationService
+namespace DevNotes.Infrastructure.Services
 {
-    private readonly HttpClient _httpClient;
-    private readonly string _summaryApiUrl = "http://127.0.0.1:5000/summary";
-
-    public SummarizationService(HttpClient httpClient)
+    public class SummarizationService : ISummarizationService
     {
-        _httpClient = httpClient;
-    }
+        private readonly HttpClient _httpClient;
+        private string _summaryApiUrl = "http://127.0.0.1:5000/summarize";
 
-    public async Task<string> SummarizeAsync(string text, CancellationToken cancellationToken = default)
-    {
-        try
+        public SummarizationService(HttpClient httpClient)
         {
-            var response = await _httpClient.PostAsJsonAsync(_summaryApiUrl, new { text = text }, cancellationToken);
-            response.EnsureSuccessStatusCode();
-
-            var result = await response.Content.ReadFromJsonAsync<SummaryResponse>(cancellationToken: cancellationToken);
-            return result?.Summary ?? string.Empty;
+            _httpClient = httpClient;
         }
-        catch (Exception)
+
+        public async Task<string> SummarizeAsync(string content, CancellationToken cancellationToken = default)
         {
-            return string.Empty;
-        }
-    }
+            var payload = new { content = content };
+            var contentJson = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
 
-    private class SummaryResponse
-    {
-        public string Summary { get; set; } = string.Empty;
+            try
+            {
+                var response = await _httpClient.PostAsync(_summaryApiUrl, contentJson, cancellationToken);
+                response.EnsureSuccessStatusCode();
+
+                var responseJson = await response.Content.ReadAsStringAsync(cancellationToken);
+                var result = JsonSerializer.Deserialize<SummaryResponse>(responseJson, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+                return result?.Summary ?? string.Empty;
+            }
+            catch (Exception)
+            {
+                return string.Empty;
+            }
+        }
+
+        private class SummaryResponse
+        {
+            public string Summary { get; set; } = string.Empty;
+        }
     }
 }
