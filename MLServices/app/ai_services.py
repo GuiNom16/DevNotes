@@ -87,7 +87,7 @@ def tags_endpoint():
     tags = generate_tags(content)
     return jsonify({"tags": tags})
 
-@app.route('/summary', methods=['POST'])
+@app.route('/summarize', methods=['POST'])
 def summary_endpoint():
     data = request.json
     content = data.get("content", "")
