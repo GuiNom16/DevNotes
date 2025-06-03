@@ -57,7 +57,7 @@ export async function suggestTags(noteText: string): Promise<string[]> {
 // ✅ Summarize note content
 export async function summarizeNote(noteText: string): Promise<string> {
   const response = await fetch(
-    "https://localhost:7012/api/summarizations/summarize",
+    "https://localhost:7012/api/summarization/summarize",
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -65,7 +65,8 @@ export async function summarizeNote(noteText: string): Promise<string> {
     }
   );
   if (!response.ok) throw new Error("Failed to summarize note");
-  return await response.text(); // Returns plain text
+  const { summary } = await response.json();
+  return summary;
 }
 
 // ✅ Beautify note content using AI

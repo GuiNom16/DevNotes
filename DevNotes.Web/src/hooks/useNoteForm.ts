@@ -47,14 +47,11 @@ export const useNoteForm = ({
     }
   }, [initialData]);
 
-  // Generate summary (unchanged)
   const generateSummary = async (text: string) => {
     setSummaryLoading(true);
     setSummaryError(null);
     try {
-      await new Promise((r) => setTimeout(r, 1500));
-      const fakeSummary = text.length > 100 ? text.slice(0, 100) + "..." : text;
-      setSummary(fakeSummary);
+      setSummary(text);
     } catch (e) {
       setSummaryError("Failed to generate summary. Please try again.");
     } finally {
@@ -170,6 +167,7 @@ export const useNoteForm = ({
     handleAddTagClick,
     summary,
     setSummary,
+    setSummaryLoading,
     summaryLoading,
     summaryError,
     setIsSummaryOpen,

@@ -1,54 +1,111 @@
-# React + TypeScript + Vite
+# DevNotes - Web Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**DevNotes** is a modern, fast, and responsive web frontend built with **React**, **Vite**, and **TypeScript**. It serves as the user interface for managing and organizing developer notes efficiently.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 📂 Project Structure (Typical)
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```
+.
+├── public/               # Static assets (images, favicon, etc.)
+├── src/                  # Source files (components, pages, styles)
+│   ├── components/
+│   ├── pages/
+│   ├── routes/
+│   ├── styles/
+│   └── main.tsx          # Application entry point
+├── vite.config.ts        # Vite config
+├── tsconfig.json         # TypeScript config
+├── package.json          # Project metadata and dependencies
+└── jest.config.ts        # Jest testing config
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 🚀 Features & Libraries
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+- **React 19** — UI library
+- **Vite** — Fast build and development tool
+- **TypeScript** — Static typing for JS
+- **React Router DOM** — Client-side routing
+- **Axios** — HTTP client for API calls
+- **TailwindCSS** — Utility-first CSS framework (via `@tailwindcss/vite`)
+- **React Toastify** — Toast notifications
+- **Lottie React** — Animation support
+- **Lucide React** — Icon library
+
+---
+
+## ⚙️ Scripts & Commands
+
+| Script            | Description                                      |
+| ----------------- | ------------------------------------------------ |
+| `npm run dev`     | Start development server (http://localhost:5173) |
+| `npm run build`   | Build production-ready files                     |
+| `npm run preview` | Preview production build locally                 |
+| `npm run lint`    | Run ESLint checks                                |
+| `npm run test`    | Run unit tests with Jest                         |
+
+---
+
+## 💻 Local Development Setup
+
+1. **Clone the repo**
+
+   ```bash
+   git clone https://github.com/GuiNom16/DevNotes.git
+   cd DevNotes.Web
+   ```
+
+2. **Install dependencies**
+
+   ```bash
+   npm install
+   ```
+
+3. **Start the development server**
+
+   ```bash
+   npm run dev
+   ```
+
+4. **Open your browser**
+
+   Go to [http://localhost:5173](http://localhost:5173)
+
+---
+
+## 🧪 Testing
+
+Unit tests are powered by Jest and React Testing Library.
+
+Run tests with:
+
+```bash
+npm run test
 ```
+
+---
+
+## 🎨 Styling
+
+Uses TailwindCSS via the Vite plugin for rapid and responsive UI styling.
+
+Customize Tailwind config in `tailwind.config.js`.
+
+---
+
+## 🔧 Configuration
+
+- TypeScript settings are managed in `tsconfig.json`.
+- Vite configuration is in `vite.config.ts`.
+- ESLint config and plugins ensure code quality and consistency.
+
+---
+
+## 🤝 Contribution
+
+Feel free to open issues or pull requests. Please follow the existing code style and run tests before submitting.
+
+Happy coding! 🚀

@@ -10,6 +10,7 @@ import {
   removeTag,
   beautifyNoteContent,
   fetchTags,
+  summarizeNote,
 } from "../features/notes/api";
 import NotesList from "../features/notes/components/NotesList/NotesList";
 import CreateNoteForm from "../features/notes/components/CreateNoteForm/CreateNoteForm";
@@ -142,26 +143,6 @@ const NotesPage: React.FC = () => {
     }
   };
 
-  // const handleAssignTags = async (noteId: string, newTags: string[]) => {
-  //   try {
-  //     setEditingNote(
-  //       (prev) =>
-  //         ({
-  //           ...(prev ?? {}),
-  //           tags: newTags,
-  //         } as NoteDTO)
-  //     );
-
-  //     await assignTags(noteId, newTags);
-  //     await loadNotes();
-  //     setSuggestedTags([]);
-  //   } catch (error) {
-  //     console.error("Error assigning tags:", error);
-  //     toast.error("Error assigning tags:");
-  //     setTagError("Failed to assign tags");
-  //   }
-  // };
-
   const handleAssignTags = async (noteId: string, newTags: string[]) => {
     try {
       setEditingNote((prev) => {
@@ -227,6 +208,20 @@ const NotesPage: React.FC = () => {
     }
   };
 
+  const handleSummarizeNote = async (): Promise<string> => {
+    if (!editingNote) throw new Error("No note to summarize");
+
+    try {
+      const summary = await summarizeNote(editingNote.content);
+      toast.success("Note summarized");
+      return summary;
+    } catch (error) {
+      console.error("Failed to summarize note:", error);
+      toast.error("Failed to summarize note");
+      throw error;
+    }
+  };
+
   return (
     <div>
       <div ref={formRef}>
@@ -236,6 +231,7 @@ const NotesPage: React.FC = () => {
           initialData={editingNote ?? undefined}
           isEditing={!!editingNote}
           onCancel={handleCancelEdit}
+          onSummarize={handleSummarizeNote}
           onBeautify={handleBeautifyNote}
           onSuggestTags={
             editingNote

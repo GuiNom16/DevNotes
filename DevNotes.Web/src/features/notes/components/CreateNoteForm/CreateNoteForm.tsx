@@ -10,6 +10,7 @@ interface CreateNoteFormProps {
   initialData?: NoteDTO;
   isEditing?: boolean;
   onCancel?: () => void;
+  onSummarize?: () => Promise<string>;
   onBeautify?: () => Promise<string>;
   onSuggestTags?: () => Promise<string[]>;
   suggestedTags?: string[];
@@ -26,6 +27,7 @@ const CreateNoteForm: React.FC<CreateNoteFormProps> = ({
   initialData,
   isEditing = false,
   onCancel,
+  onSummarize,
   onBeautify,
   onSuggestTags,
   onAssignTags,
@@ -53,6 +55,7 @@ const CreateNoteForm: React.FC<CreateNoteFormProps> = ({
     setSummary,
     summaryLoading,
     summaryError,
+    setSummaryLoading,
     setIsSummaryOpen,
     isSummaryOpen,
     handleSummarizeClick,
@@ -161,11 +164,24 @@ const CreateNoteForm: React.FC<CreateNoteFormProps> = ({
           <button
             type="button"
             data-testid="summarize-button"
-            onClick={handleSummarizeClick}
-            disabled={summaryLoading}
+            onClick={async () => {
+              if (!onSummarize) return;
+
+              setSummaryLoading(true);
+              try {
+                const newContent = await onSummarize();
+                setSummary(newContent);
+                setIsSummaryOpen(true); // show the panel/modal after getting summary
+              } catch (err) {
+                console.error("Error:", err);
+              } finally {
+                setSummaryLoading(false);
+              }
+            }}
+            disabled={!onSummarize || summaryLoading}
             className="px-4 py-2 rounded transition disabled:opacity-50
-               bg-indigo-500 hover:bg-indigo-600 text-white
-               dark:bg-indigo-600 dark:hover:bg-indigo-700"
+     bg-indigo-500 hover:bg-indigo-600 text-white
+     dark:bg-indigo-600 dark:hover:bg-indigo-700"
           >
             🧠 {summaryLoading ? "Summarizing..." : "Summarize"}
           </button>
