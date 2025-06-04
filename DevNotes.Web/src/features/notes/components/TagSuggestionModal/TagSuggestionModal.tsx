@@ -5,7 +5,7 @@ interface TagSuggestionModalProps {
   onClose: () => void;
   suggestedTags: string[];
   allTags: string[];
-  selectedTags: string[]; // passed from parent (already selected tags)
+  selectedTags: string[];
   onAddSelected: (tags: string[]) => void;
 }
 

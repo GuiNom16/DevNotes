@@ -1,8 +1,8 @@
 using DevNotes.Application.Common.Behaviors;
 using DevNotes.Application.Features.Notes.Commands.CreateNote;
-using DevNotes.Application.Features.TagSuggestions.Queries.SuggestTags;
 using DevNotes.Application.Interfaces;
 using DevNotes.Application.Notes.Queries;
+using DevNotes.Application.Services;
 using DevNotes.Infrastructure.Configuration;
 using DevNotes.Infrastructure.Extensions;
 using DevNotes.Infrastructure.Persistence;
@@ -48,8 +48,8 @@ builder.Services.AddMediatR(typeof(GetAllNotesQueryHandler).Assembly);
 // DI
 builder.Services.AddScoped<INoteRepository, NoteRepository>();
 builder.Services.AddScoped<ITagRepository, TagRepository>();
-builder.Services.AddScoped<ITagSuggestionService, TagSuggestionService>();
 builder.Services.AddScoped<ITagAssociationService, TagAssociationService>();
+builder.Services.AddScoped<ITagSuggestionService, TagSuggestionService>();
 builder.Services.AddScoped<INoteBeautificationService, NoteBeautificationService>();
 builder.Services.AddScoped<ISummarizationService, SummarizationService>();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateNoteCommandValidator>();

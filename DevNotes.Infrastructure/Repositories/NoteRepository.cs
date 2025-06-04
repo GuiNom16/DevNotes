@@ -1,13 +1,7 @@
 ﻿using DevNotes.Application.Interfaces;
 using DevNotes.Domain.Entities;
-using DevNotes.Application.Interfaces;
 using DevNotes.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DevNotes.Infrastructure.Repositories
 {
@@ -28,13 +22,15 @@ namespace DevNotes.Infrastructure.Repositories
 
         public async Task<Note> GetByIdAsync(Guid id)
         {
-            return await _context.Notes.FindAsync(id);
+            return await _context.Notes
+                .Include(n => n.Tags)
+                .FirstOrDefaultAsync(n => n.Id == id);
         }
 
         public async Task<List<Note>> GetAllAsync(CancellationToken cancellationToken)
         {
             return await _context.Notes
-            .Include(n => n.Tags)  // Include tags eagerly
+            .Include(n => n.Tags)
             .ToListAsync(cancellationToken);
         }
 
@@ -54,7 +50,7 @@ namespace DevNotes.Infrastructure.Repositories
             }
         }
 
-       
+
     }
 
 }

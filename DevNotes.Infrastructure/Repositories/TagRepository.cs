@@ -1,11 +1,7 @@
 ﻿using DevNotes.Application.Interfaces;
+using DevNotes.Domain.Entities;
 using DevNotes.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DevNotes.Infrastructure.Repositories
 {
@@ -25,6 +21,19 @@ namespace DevNotes.Infrastructure.Repositories
                 .Distinct()
                 .OrderBy(name => name)
                 .ToListAsync();
+        }
+
+        public async Task<List<Tag>> GetTagsByNamesAsync(List<string> tagNames, CancellationToken cancellationToken)
+        {
+            return await _context.Tags
+                .Where(t => tagNames.Contains(t.Name))
+                .ToListAsync(cancellationToken);
+        }
+
+        public async Task AddTagsAsync(List<Tag> tags, CancellationToken cancellationToken)
+        {
+            await _context.Tags.AddRangeAsync(tags, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }

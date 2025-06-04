@@ -7,7 +7,6 @@ using DevNotes.Application.Features.Tags.Commands.RemoveTagFromNote;
 using DevNotes.Application.Interfaces;
 using DevNotes.Domain.Entities;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DevNotes.API.Controllers

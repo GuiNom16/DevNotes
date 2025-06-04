@@ -1,16 +1,13 @@
 ﻿using DevNotes.Application.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace DevNotes.Infrastructure.Services
 {
     public class NoteBeautificationService : INoteBeautificationService
     {
         private readonly HttpClient _httpClient;
+        private string _beautifyApiUrl = "http://localhost:5000/summarize";
 
         public NoteBeautificationService(HttpClient httpClient)
         {
@@ -22,7 +19,7 @@ namespace DevNotes.Infrastructure.Services
             var payload = new { content = content };
             var contentJson = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PostAsync("http://localhost:5000/beautify", contentJson, cancellationToken);
+            var response = await _httpClient.PostAsync(_beautifyApiUrl, contentJson, cancellationToken);
             response.EnsureSuccessStatusCode();
 
             var responseJson = await response.Content.ReadAsStringAsync(cancellationToken);

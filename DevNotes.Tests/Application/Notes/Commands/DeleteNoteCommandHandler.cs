@@ -1,14 +1,8 @@
-﻿using DevNotes.Application.Features.Notes.Commands;
-using DevNotes.Application.Features.Notes.Commands.DeleteNote;
+﻿using DevNotes.Application.Features.Notes.Commands.DeleteNote;
 using DevNotes.Application.Interfaces;
 using DevNotes.Domain.Entities;
-using DevNotes.Application.Interfaces;
 using FluentAssertions;
 using Moq;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Xunit;
 
 namespace DevNotes.Tests.Application.Notes.Commands
 {

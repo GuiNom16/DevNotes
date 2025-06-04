@@ -1,14 +1,9 @@
 ﻿using DevNotes.Application.DTOs;
 using DevNotes.Application.Features.Notes.Queries;
 using DevNotes.Application.Interfaces;
-using DevNotes.Application.Notes.Queries;
 using DevNotes.Domain.Entities;
 using FluentAssertions;
 using Moq;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Xunit;
 
 namespace DevNotes.Tests.Application.Notes.Queries
 {
@@ -22,12 +17,12 @@ namespace DevNotes.Tests.Application.Notes.Queries
             var handler = new GetNoteByIdQueryHandler(mockRepo.Object);
             var noteId = Guid.NewGuid();
 
-                var note = new Note
-                {
-                    Id = noteId,
-                    Title = "Test Note",
-                    Content = "Test Content"
-                };
+            var note = new Note
+            {
+                Id = noteId,
+                Title = "Test Note",
+                Content = "Test Content"
+            };
 
             mockRepo.Setup(r => r.GetByIdAsync(noteId))
                     .ReturnsAsync(note);

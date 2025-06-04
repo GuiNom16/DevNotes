@@ -1,41 +1,38 @@
-﻿using DevNotes.Application.Features.Tags.Commands.RemoveTagFromNote;
-using DevNotes.Infrastructure.Persistence;
-using DevNotes.Infrastructure.Services;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using DevNotes.Application.Common.Exceptions;
+using DevNotes.Application.Features.Tags.Commands.RemoveTagFromNote;
+using DevNotes.Application.Interfaces;
+using DevNotes.Application.Services;
+using DevNotes.Domain.Entities;
+using Moq;
 
 namespace DevNotes.Tests.Application.Tags.Commands.RemoveTagFromNote
 {
     public class RemoveTagFromNoteCommandHandlerTests
     {
-        private NotesDbContext GetInMemoryDbContext()
-        {
-            var options = new DbContextOptionsBuilder<NotesDbContext>()
-                .UseInMemoryDatabase(Guid.NewGuid().ToString())
-                .Options;
-
-            return new NotesDbContext(options);
-        }
-
         [Fact]
         public async Task Handle_RemovesTagFromNote_Successfully()
         {
             // Arrange
-            using var context = GetInMemoryDbContext();
-
-            var tag = new Domain.Entities.Tag { Name = "tagToRemove" };
+            var tagToRemove = new Tag { Name = "tagToRemove" };
             var noteId = Guid.NewGuid();
-            var note = new Domain.Entities.Note { Id = noteId, Tags = new List<Domain.Entities.Tag> { tag } };
+            var existingNote = new Note
+            {
+                Id = noteId,
+                Tags = new List<Tag> { tagToRemove }
+            };
 
-            context.Tags.Add(tag);
-            context.Notes.Add(note);
-            await context.SaveChangesAsync();
+            var mockNoteRepository = new Mock<INoteRepository>();
+            mockNoteRepository
+                .Setup(r => r.GetByIdAsync(noteId))
+                .ReturnsAsync(existingNote);
+            mockNoteRepository
+                .Setup(r => r.UpdateAsync(It.IsAny<Note>()))
+                .Returns(Task.CompletedTask);
 
-            var service = new TagAssociationService(context);
+            var mockTagRepository = new Mock<ITagRepository>();
+            // We might not need any special setup for tag repo here if service only uses note repo for removal
+
+            var service = new TagAssociationService(mockNoteRepository.Object, mockTagRepository.Object);
             var handler = new RemoveTagFromNoteCommandHandler(service);
 
             var command = new RemoveTagFromNoteCommand
@@ -48,17 +45,23 @@ namespace DevNotes.Tests.Application.Tags.Commands.RemoveTagFromNote
             await handler.Handle(command, CancellationToken.None);
 
             // Assert
-            var updatedNote = await context.Notes.Include(n => n.Tags).FirstAsync(n => n.Id == noteId);
-            Assert.DoesNotContain(updatedNote.Tags, t => t.Name == "tagToRemove");
+            Assert.DoesNotContain(existingNote.Tags, t => t.Name == "tagToRemove");
+
+            mockNoteRepository.Verify(r => r.UpdateAsync(existingNote), Times.Once);
         }
 
         [Fact]
         public async Task Handle_ThrowsNotFoundException_WhenNoteDoesNotExist()
         {
             // Arrange
-            using var context = GetInMemoryDbContext();
+            var mockNoteRepository = new Mock<INoteRepository>();
+            mockNoteRepository
+                .Setup(r => r.GetByIdAsync(It.IsAny<Guid>()))
+                .ReturnsAsync((Note?)null); // Note not found
 
-            var service = new TagAssociationService(context);
+            var mockTagRepository = new Mock<ITagRepository>();
+
+            var service = new TagAssociationService(mockNoteRepository.Object, mockTagRepository.Object);
             var handler = new RemoveTagFromNoteCommandHandler(service);
 
             var command = new RemoveTagFromNoteCommand
@@ -68,8 +71,7 @@ namespace DevNotes.Tests.Application.Tags.Commands.RemoveTagFromNote
             };
 
             // Act & Assert
-            await Assert.ThrowsAsync<DevNotes.Application.Common.Exceptions.NotFoundException>(() =>
-                handler.Handle(command, CancellationToken.None));
+            await Assert.ThrowsAsync<NotFoundException>(() => handler.Handle(command, CancellationToken.None));
         }
     }
 }

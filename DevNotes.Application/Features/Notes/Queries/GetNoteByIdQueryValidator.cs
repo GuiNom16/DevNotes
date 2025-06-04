@@ -1,5 +1,4 @@
-﻿using DevNotes.Application.Features.Notes.Queries;
-using FluentValidation;
+﻿using FluentValidation;
 
 namespace DevNotes.Application.Features.Notes.Queries;
 

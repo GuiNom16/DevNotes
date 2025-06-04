@@ -1,36 +1,43 @@
 ﻿using DevNotes.Application.Features.Tags.Commands.AssignTagsToNote;
-using DevNotes.Infrastructure.Persistence;
-using DevNotes.Infrastructure.Services;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using DevNotes.Application.Interfaces;
+using DevNotes.Application.Services;
+using DevNotes.Domain.Entities;
+using Moq;
 
 namespace DevNotes.Tests.Application.Tags.Commands.AssignTagsToNote
 {
     public class AssignTagsToNoteCommandHandlerTests
     {
-        private NotesDbContext GetInMemoryDbContext()
-        {
-            var options = new DbContextOptionsBuilder<NotesDbContext>()
-                .UseInMemoryDatabase(Guid.NewGuid().ToString())
-                .Options;
-
-            return new NotesDbContext(options);
-        }
-
         [Fact]
         public async Task Handle_AssignsTagsToNote_Successfully()
         {
             // Arrange
-            using var context = GetInMemoryDbContext();
             var noteId = Guid.NewGuid();
-            context.Notes.Add(new Domain.Entities.Note { Id = noteId, Tags = new List<Domain.Entities.Tag>() });
-            await context.SaveChangesAsync();
 
-            var service = new TagAssociationService(context);
+            var existingNote = new Note
+            {
+                Id = noteId,
+                Tags = new List<Tag>()
+            };
+
+            var mockNoteRepository = new Mock<INoteRepository>();
+            mockNoteRepository
+                .Setup(r => r.GetByIdAsync(noteId))
+                .ReturnsAsync(existingNote);
+            mockNoteRepository
+                .Setup(r => r.UpdateAsync(It.IsAny<Note>()))
+                .Returns(Task.CompletedTask);
+
+            var mockTagRepository = new Mock<ITagRepository>();
+            // Let's assume no existing tags, so return empty list when asked for tags by name
+            mockTagRepository
+                .Setup(r => r.GetTagsByNamesAsync(It.IsAny<List<string>>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new List<Tag>());
+            mockTagRepository
+                .Setup(r => r.AddTagsAsync(It.IsAny<List<Tag>>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
+            var service = new TagAssociationService(mockNoteRepository.Object, mockTagRepository.Object);
             var handler = new AssignTagsToNoteCommandHandler(service);
 
             var command = new AssignTagsToNoteCommand
@@ -43,18 +50,29 @@ namespace DevNotes.Tests.Application.Tags.Commands.AssignTagsToNote
             await handler.Handle(command, CancellationToken.None);
 
             // Assert
-            var note = await context.Notes.Include(n => n.Tags).FirstAsync(n => n.Id == noteId);
-            Assert.Equal(2, note.Tags.Count);
-            Assert.Contains(note.Tags, t => t.Name == "tagA");
-            Assert.Contains(note.Tags, t => t.Name == "tagB");
+            // The note's Tags property should contain the two new tags
+            Assert.Equal(2, existingNote.Tags.Count);
+            Assert.Contains(existingNote.Tags, t => t.Name == "tagA");
+            Assert.Contains(existingNote.Tags, t => t.Name == "tagB");
+
+            // Verify UpdateAsync was called once
+            mockNoteRepository.Verify(r => r.UpdateAsync(existingNote), Times.Once);
+            // Verify AddTagsAsync was called once with the new tags
+            mockTagRepository.Verify(r => r.AddTagsAsync(It.Is<List<Tag>>(tags => tags.Count == 2), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Fact]
         public async Task Handle_ThrowsException_WhenNoteNotFound()
         {
             // Arrange
-            using var context = GetInMemoryDbContext();
-            var service = new TagAssociationService(context);
+            var mockNoteRepository = new Mock<INoteRepository>();
+            mockNoteRepository
+                .Setup(r => r.GetByIdAsync(It.IsAny<Guid>()))
+                .ReturnsAsync((Note?)null); // Simulate note not found
+
+            var mockTagRepository = new Mock<ITagRepository>();
+
+            var service = new TagAssociationService(mockNoteRepository.Object, mockTagRepository.Object);
             var handler = new AssignTagsToNoteCommandHandler(service);
 
             var command = new AssignTagsToNoteCommand

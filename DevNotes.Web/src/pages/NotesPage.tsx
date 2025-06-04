@@ -77,7 +77,7 @@ const NotesPage: React.FC = () => {
       return newNote;
     } catch (error) {
       toast.error("Failed to create note");
-      throw error; // Re-throw so caller knows
+      throw error;
     }
   };
 
@@ -105,7 +105,7 @@ const NotesPage: React.FC = () => {
     } catch (error) {
       console.error("Error deleting note:", error);
     } finally {
-      setConfirmDeleteId(null); // Close modal
+      setConfirmDeleteId(null);
     }
   };
 
@@ -123,7 +123,6 @@ const NotesPage: React.FC = () => {
     setEditingNote(null);
     setSuggestedTags([]);
     setTagError(null);
-    // No scroll needed here when canceling edit
   };
 
   const handleSuggestTags = async (noteContent: string): Promise<string[]> => {

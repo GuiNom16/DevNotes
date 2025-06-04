@@ -1,9 +1,6 @@
-﻿using DevNotes.Domain.Entities;
-using DevNotes.Application.Interfaces;
+﻿using DevNotes.Application.Interfaces;
+using DevNotes.Domain.Entities;
 using MediatR;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace DevNotes.Application.Features.Notes.Commands.CreateNote
 {

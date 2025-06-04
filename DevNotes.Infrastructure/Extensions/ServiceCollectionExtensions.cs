@@ -1,9 +1,7 @@
 ﻿using DevNotes.Application.Interfaces;
 using DevNotes.Infrastructure.Persistence;
-using DevNotes.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Http;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DevNotes.Infrastructure.Extensions

@@ -1,11 +1,6 @@
 ﻿using DevNotes.Application.Features.NoteBeautification.Queries;
 using DevNotes.Application.Interfaces;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DevNotes.Tests.Application.NoteBeautification.Queries
 {

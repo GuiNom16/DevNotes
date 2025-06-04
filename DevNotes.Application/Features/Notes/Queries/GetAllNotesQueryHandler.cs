@@ -1,12 +1,8 @@
 ﻿using DevNotes.Application.DTOs;
 using DevNotes.Application.Features.Notes.Queries;
-using DevNotes.Application.Mappers;
-using DevNotes.Domain.Entities;
 using DevNotes.Application.Interfaces;
+using DevNotes.Application.Mappers;
 using MediatR;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace DevNotes.Application.Notes.Queries
 {

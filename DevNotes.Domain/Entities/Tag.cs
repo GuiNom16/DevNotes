@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace DevNotes.Domain.Entities
+﻿namespace DevNotes.Domain.Entities
 {
     public class Tag
     {

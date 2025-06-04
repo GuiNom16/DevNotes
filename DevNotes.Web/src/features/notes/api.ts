@@ -54,22 +54,52 @@ export async function suggestTags(noteText: string): Promise<string[]> {
   return await response.json();
 }
 
-// ✅ Summarize note content
+// Summarize note content
+// export async function summarizeNote(noteText: string): Promise<string> {
+//   const response = await fetch(
+//     "https://localhost:7012/api/summarization/summarize",
+//     {
+//       method: "POST",
+//       headers: { "Content-Type": "application/json" },
+//       body: JSON.stringify({ text: noteText }),
+//     }
+//   );
+//   if (!response.ok) throw new Error("Failed to summarize note");
+//   const { summary } = await response.json();
+//   return summary;
+// }
 export async function summarizeNote(noteText: string): Promise<string> {
-  const response = await fetch(
-    "https://localhost:7012/api/summarization/summarize",
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text: noteText }),
+  try {
+    const response = await fetch(
+      "https://localhost:7012/api/summarization/summarize",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: noteText }),
+      }
+    );
+
+    if (!response.ok) {
+      // Try to read error message from the backend
+      const errorData = await response.json().catch(() => null);
+      const message =
+        errorData?.error ||
+        `Summarization failed with status ${response.status}`;
+      throw new Error(message);
     }
-  );
-  if (!response.ok) throw new Error("Failed to summarize note");
-  const { summary } = await response.json();
-  return summary;
+
+    const { summary } = await response.json();
+    return summary;
+  } catch (err) {
+    // Re-throw with a more helpful error message
+    if (err instanceof Error) {
+      throw new Error(`Summarization error: ${err.message}`);
+    }
+    throw new Error("Unknown summarization error");
+  }
 }
 
-// ✅ Beautify note content using AI
+// Beautify note content using AI
 export async function beautifyNoteContent(noteText: string): Promise<string> {
   const response = await fetch(
     "https://localhost:7012/api/contentbeautification/beautify",

@@ -58,7 +58,6 @@ const CreateNoteForm: React.FC<CreateNoteFormProps> = ({
     setSummaryLoading,
     setIsSummaryOpen,
     isSummaryOpen,
-    handleSummarizeClick,
     handleAcceptSummary,
     isUnchanged,
     beautifyLoading,
@@ -118,7 +117,7 @@ const CreateNoteForm: React.FC<CreateNoteFormProps> = ({
               {tag}
               <button
                 type="button"
-                onClick={() => onRemoveTag && onRemoveTag(tag)} // Use prop callback here
+                onClick={() => onRemoveTag && onRemoveTag(tag)}
                 className="ml-2 text-amber-900 dark:text-amber-900 hover:text-amber-700 dark:hover:text-amber-600
                  font-bold rounded-full focus:outline-none focus:ring-1 focus:ring-amber-700"
                 aria-label={`Remove tag ${tag}`}
@@ -171,7 +170,7 @@ const CreateNoteForm: React.FC<CreateNoteFormProps> = ({
               try {
                 const newContent = await onSummarize();
                 setSummary(newContent);
-                setIsSummaryOpen(true); // show the panel/modal after getting summary
+                setIsSummaryOpen(true);
               } catch (err) {
                 console.error("Error:", err);
               } finally {

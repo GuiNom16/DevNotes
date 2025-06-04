@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace DevNotes.Application.Interfaces
+﻿namespace DevNotes.Application.Interfaces
 {
     public interface ITagAssociationService
     {

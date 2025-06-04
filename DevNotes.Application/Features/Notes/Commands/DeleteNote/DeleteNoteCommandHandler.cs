@@ -1,8 +1,5 @@
 ﻿using DevNotes.Application.Interfaces;
-using DevNotes.Application.Interfaces;
 using MediatR;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace DevNotes.Application.Features.Notes.Commands.DeleteNote
 {

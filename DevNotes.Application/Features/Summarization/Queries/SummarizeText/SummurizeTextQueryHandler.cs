@@ -1,5 +1,4 @@
-﻿using DevNotes.Application.Features.Summarization.Queries.SummarizeText;
-using DevNotes.Application.Interfaces;
+﻿using DevNotes.Application.Interfaces;
 using MediatR;
 
 namespace DevNotes.Application.Features.Summarization.Queries.SummarizeText

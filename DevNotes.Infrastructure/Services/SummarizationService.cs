@@ -1,17 +1,13 @@
 ﻿using DevNotes.Application.Interfaces;
-using System;
-using System.Net.Http;
 using System.Text;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace DevNotes.Infrastructure.Services
 {
     public class SummarizationService : ISummarizationService
     {
         private readonly HttpClient _httpClient;
-        private string _summaryApiUrl = "http://127.0.0.1:5000/summarize";
+        private string _summaryApiUrl = "http://localhost:5000/summarize";
 
         public SummarizationService(HttpClient httpClient)
         {
@@ -23,24 +19,26 @@ namespace DevNotes.Infrastructure.Services
             var payload = new { content = content };
             var contentJson = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
 
-            try
-            {
-                var response = await _httpClient.PostAsync(_summaryApiUrl, contentJson, cancellationToken);
-                response.EnsureSuccessStatusCode();
+            var response = await _httpClient.PostAsync(_summaryApiUrl, contentJson, cancellationToken);
 
-                var responseJson = await response.Content.ReadAsStringAsync(cancellationToken);
-                var result = JsonSerializer.Deserialize<SummaryResponse>(responseJson, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                });
-
-                return result?.Summary ?? string.Empty;
-            }
-            catch (Exception)
+            // If the backend returns an error, bubble it up properly
+            if (!response.IsSuccessStatusCode)
             {
-                return string.Empty;
+                var errorMessage = await response.Content.ReadAsStringAsync(cancellationToken);
+                throw new ApplicationException(
+                    $"Summarization API failed with status {response.StatusCode}: {errorMessage}"
+                );
             }
+
+            var responseJson = await response.Content.ReadAsStringAsync(cancellationToken);
+            var result = JsonSerializer.Deserialize<SummaryResponse>(responseJson, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            return result?.Summary ?? throw new ApplicationException("Summarization API returned no summary");
         }
+
 
         private class SummaryResponse
         {

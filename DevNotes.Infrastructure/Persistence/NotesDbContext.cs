@@ -1,6 +1,5 @@
 ﻿using DevNotes.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
 
 namespace DevNotes.Infrastructure.Persistence
 {
