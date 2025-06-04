@@ -158,9 +158,3 @@ python app/ai_services.py
 - **Docker** — Containerized service
 
 ---
-
-## 📄 License
-
-This project is part of a larger private application and may be proprietary depending on your use case. Add a license if open-sourcing.
-
----
