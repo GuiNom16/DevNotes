@@ -12,7 +12,7 @@ stemmer = PorterStemmer()
 app = Flask(__name__)
 
 # Load models once
-summarizer = pipeline("summarization", model="sshleifer/distilbart-cnn-12-6")
+summarizer = pipeline("summarization", model="google/pegasus-xsum")
 sentence_model = SentenceTransformer('all-MiniLM-L6-v2')
 kw_model = KeyBERT(model=sentence_model)
 
@@ -44,11 +44,33 @@ def generate_tags(content):
 
     return final_tags
 
+def chunk_text(text, max_words=500):
+    """Yield successive chunks of text up to max_words words each."""
+    words = text.split()
+    for i in range(0, len(words), max_words):
+        yield ' '.join(words[i:i + max_words])
+
 def summarize_content(content):
+    """Summarize content by chunking long texts and optionally summarizing the combined summary."""
+    # If text is short, return as is
     if len(content.split()) < 50:
         return content
-    summary = summarizer(content, max_length=100, min_length=30, do_sample=False)
-    return summary[0]['summary_text']
+
+    # Summarize each chunk
+    summaries = []
+    for chunk in chunk_text(content, max_words=300):
+        summary = summarizer(chunk, max_length=150, min_length=30, do_sample=False)
+        summaries.append(summary[0]['summary_text'])
+
+    # Combine summaries
+    combined_summary = ' '.join(summaries)
+
+    # If combined summary is still long, summarize it again
+    if len(combined_summary.split()) > 50:
+        final_summary = summarizer(combined_summary, max_length=150, min_length=30, do_sample=False)
+        return final_summary[0]['summary_text']
+    else:
+        return combined_summary
 
 def beautify_content(content):
     if not openai.api_key:
@@ -89,12 +111,15 @@ def tags_endpoint():
 
 @app.route('/summarize', methods=['POST'])
 def summary_endpoint():
-    data = request.json
-    content = data.get("content", "")
-    if not content:
-        return jsonify({"error": "Content is required"}), 400
-    summary = summarize_content(content)
-    return jsonify({"summary": summary})
+    try:
+        data = request.get_json(force=True)
+        content = data.get("content", "").strip()
+        if not content:
+            return jsonify({"error": "Content is required"}), 400
+        summary = summarize_content(content)
+        return jsonify({"summary": summary})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/beautify', methods=['POST'])
 def beautify_endpoint():
