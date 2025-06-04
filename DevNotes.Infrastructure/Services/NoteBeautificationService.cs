@@ -7,7 +7,7 @@ namespace DevNotes.Infrastructure.Services
     public class NoteBeautificationService : INoteBeautificationService
     {
         private readonly HttpClient _httpClient;
-        private string _beautifyApiUrl = "http://localhost:5000/summarize";
+        private string _beautifyApiUrl = "http://localhost:5000/beautify";
 
         public NoteBeautificationService(HttpClient httpClient)
         {
