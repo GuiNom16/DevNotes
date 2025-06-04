@@ -1,4 +1,5 @@
-﻿using DevNotes.Application.Features.Tags.Commands.AssignTagsToNote;
+﻿using DevNotes.Application.Common.Exceptions;
+using DevNotes.Application.Features.Tags.Commands.AssignTagsToNote;
 using DevNotes.Application.Interfaces;
 using DevNotes.Application.Services;
 using DevNotes.Domain.Entities;
@@ -82,7 +83,7 @@ namespace DevNotes.Tests.Application.Tags.Commands.AssignTagsToNote
             };
 
             // Act & Assert
-            await Assert.ThrowsAsync<Exception>(() => handler.Handle(command, CancellationToken.None));
+            await Assert.ThrowsAsync<NotFoundException>(() => handler.Handle(command, CancellationToken.None));
         }
     }
 }
